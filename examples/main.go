@@ -2,91 +2,17 @@ package main
 
 import (
 	"fmt"
-	"iso8583/iso8583"
-	"strings"
+	"iso8583"
 )
 
 func main() {
 
-	dataTcp := "08002038000000200002810000000001084909052253415630305A303537363331202020205341564E47583130303131303032303030302020202020200011010008B9F3F723CA3CD2F8"
-
 	i := iso8583.New()
-
-	fmt.Println("Data TCP =", dataTcp)
-
-	_, err := i.Parse(dataTcp)
-	if err != nil {
-		fmt.Printf("Error Parse: %v\n", err)
-		return
-	}
-
-	i.LogFields()
-
-	fmt.Println()
-	fmt.Println("Testing ISO8583 Builder")
-	fmt.Printf("%s\n", strings.Repeat("-", 80))
-
-	index := `MTI: 0200
-Field 2 (Primary Account Number): 4000001234567890
-Field 3 (Processing Code): 000000 (Assuming purchase)
-Field 4 (Amount, Transaction): 000000006000 (60 USD, 12 digits, no decimal point)
-Field 7 (Transmission Date & Time): 0209123456 (Assuming February 9th, 12:34:56)
-Field 11 (Systems Trace Audit Number): 000001
-Field 12 (Time, Local Transaction): 123456 (12:34:56)
-Field 13 (Date, Local Transaction): 0209 (February 9th)
-Field 14 (Date, Expiration): 2402 (February 2024)
-Field 22 (Point of Service Entry Mode): 022 (Magnetic stripe, including PIN capability)
-Field 32 (Acquiring Institution Identification Code): 123456
-Field 35 (Track 2 Data): 4000001234567890=240212345
-Field 37 (Retrieval Reference Number): 123456789012
-Field 41 (Card Acceptor Terminal ID): TERM1234
-Field 42 (Card Acceptor ID Code): 123456789012345
-Field 49 (Currency Code, Transaction): 840 (USD)
-Field 54 (Additional Amounts): 0400600D000000000000 (4 installments of 60 USD)
-	`
-	fmt.Println(index)
-
-	msg := i.CreateISO("0200")
-	msg.AddField(2, "4000001234567890")
-	msg.AddField(3, "000000")
-	msg.AddField(4, "000000006000")
-	msg.AddField(7, "0209123456")
-	msg.AddField(11, "000001")
-	msg.AddField(12, "123456")
-	msg.AddField(13, "0209")
-	msg.AddField(14, "2402")
-	msg.AddField(22, "022")
-	msg.AddField(32, "123456")
-	msg.AddField(35, "4000001234567890=240212345")
-	msg.AddField(37, "123456789012")
-	msg.AddField(41, "TERM1234")
-	msg.AddField(42, "123456789012345")
-	msg.AddField(49, "840")
-	msg.AddField(54, "0400600D000000000000")
-
-	iso, err := msg.Build()
-	if err != nil {
-		fmt.Printf("Error Build: %v\n", err)
-		return
-	}
-
-	fmt.Println("ISO Generated =", iso)
-
-	_, err = i.Parse(iso)
-	if err != nil {
-		fmt.Printf("Error Parse: %v\n", err)
-		return
-	}
-
-	i.LogFields()
-
-	fmt.Println()
-	fmt.Printf("Testing2 ISO8583 Builder, adding fields with example \nvalues that correspond to typical ISO 8583 usage\n")
-	fmt.Printf("%s\n", strings.Repeat("-", 80))
-
 	// Adding fields with example values that correspond to
 	// typical ISO 8583 usage
-	msg = i.CreateISO("0200")
+
+	msg := i.CreateISO("0200")
+
 	msg.AddField(2, "1234567890123456")      // Primary Account Number
 	msg.AddField(3, "000000")                // Processing Code
 	msg.AddField(4, "000000010000")          // Amount, Transaction
@@ -118,6 +44,10 @@ Field 54 (Additional Amounts): 0400600D000000000000 (4 installments of 60 USD)
 	msg.AddField(58, "1234")                 // Authorizing Agent Institution ID
 	msg.AddField(59, "XXXXXXYYYYYYYYYZ")     // Echo Data
 	msg.AddField(64, "IFFFXPTO")             // Network Management Information Code
+
+	msg.AddField(65, "IFFFXPTO") // Network Management Information Code
+	msg.AddField(66, "IFFFXPTO") // Network Management Information Code
+	msg.AddField(67, "IFFFXPTO") // Network Management Information Code
 
 	isoMessage, err := msg.Build()
 	if err != nil {
